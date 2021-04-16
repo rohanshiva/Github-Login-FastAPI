@@ -234,7 +234,9 @@ def github_authenticate(code:str):
 
         return users_db.put(user)
     except:
-        raise HTTPException(status_code=401, detail='Failed to add user to users_db')```
+        raise HTTPException(status_code=401, detail='Failed to add user to users_db')
+```
+        
 
 After we get the user information, we are storing it in our `users_db` Deta Base. If there is an error, we can just return another `HTTPException`
 
