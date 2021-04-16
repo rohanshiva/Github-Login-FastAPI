@@ -2,7 +2,7 @@
 
 So you want to add GitHub login to your FastAPI applications? Let's do it!
 
-GitHub Login essentially allows users to login using their GitHub account. Using the GitHub API we can access information such as username, email, profile picture, and user id. Compared to building a traditional login system with an email and password, using external login providers like GitHub makes it it easier for people building the apps as there is a lot less work, plus it makes it simpler for the users. In this article, we are going to use GitHub's OAuth provider to build a simple login system in a FastAPI application. We will also use Deta Base as our database to store user's information such as username, email, user id, and profile pic. 
+GitHub Login essentially allows users to login using their GitHub account. Using the GitHub API we can access information such as username, email, profile picture, and user id. Compared to building a traditional login system with an email and password, using external login providers like GitHub makes it it easier for people building the apps as there is a lot less work, plus it makes it simpler for the users. In this article, we are going to use GitHub's OAuth provider to build a simple login system in a FastAPI application. We will also use Deta Base as our database to store user's information such as username, email, user id, and profile pic. [The full code is avaialable here.] (https://github.com/rohanshiva/Github-Login-FastAPI/tree/main)
 
 ## Agenda
 
@@ -288,4 +288,5 @@ deta login
 deta new 
 ```
 
-Thank you for reading! If you liked this article, [check out the other one which implements JWT Auth in a FastAPI application.](https://dev.to/deta/deta-fastapi-jwt-auth-part-1-4c82) 
+Thank you for reading! If you liked this article, [check out the other one which implements JWT Auth in a FastAPI application.](https://dev.to/deta/deta-fastapi-jwt-auth-part-1-4c82) [The full code is avaialable here.] (https://github.com/rohanshiva/Github-Login-FastAPI/tree/main)
+
