@@ -272,6 +272,7 @@ def github_authenticate(code:str):
         raise HTTPException(status_code=401, detail='Failed to add user to users_db')
 ```
 
+![3099af58-cf5d-4b48-8176-adf625e2e0e5](https://user-images.githubusercontent.com/20916697/115048483-3a4c4e00-9e9f-11eb-8df2-44ff944cf814.gif)
 
 ## Deploy on Deta micros
 [Install the Deta CLI](https://docs.deta.sh/docs/cli/install), and run the following commands in the same directory to deploy our app on Deta micros. 
