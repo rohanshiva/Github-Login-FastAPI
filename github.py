@@ -2,15 +2,11 @@ from urllib.parse import urlencode
 import requests
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
-from dotenv import dotenv_values
+import os
 
-from user import User
-
-
-config = dotenv_values(".env")
-CLIENT_ID = config['CLIENT_ID']
-CLIENT_SECRET = config['CLIENT_SECRET']
-REDIRECT_URI = config['REDIRECT_URI']
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = "http://127.0.0.1:8000/authenticate/github"
 GITHUB_LOGIN_URL = 'https://github.com/login/oauth/authorize?'
 ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token?'
 
@@ -42,5 +38,3 @@ class GithubOauth():
             return {'key':key, 'email': email, 'username': username, 'avatar_url': avatar_url}
         except:
             raise HTTPException(status_code=401, detail="Failed to fetch user details")
-        
-    
