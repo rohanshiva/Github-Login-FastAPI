@@ -1,16 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
-
 from deta import Deta
 from github import GithubOauth
-from dotenv import dotenv_values
-
-config = dotenv_values(".env")
-DETA_PROJECT_KEY = config['DETA_PROJECT_KEY']
 
 app = FastAPI()
 
-deta = Deta(DETA_PROJECT_KEY)
+deta = Deta()
 users_db = deta.Base('users')
 
 github_oauth_handler = GithubOauth()
