@@ -24,22 +24,19 @@ Create a new project and make sure to save the key in a secure place!
 
 ![image](https://user-images.githubusercontent.com/20916697/114434122-40cd8380-9b88-11eb-8ddc-7045ce5756ba.png)
 
-Now we need to [install the Deta CLI](https://docs.deta.sh/docs/cli/install), we are deploying our application on Deta micros. After installing the CLI, create a folder for this project `github-login-fastapi`. 
+We also need to [install the Deta CLI](https://docs.deta.sh/docs/cli/install) to deploy our application on Deta micros. After installing the CLI, create a folder for this project `github-login-fastapi` and run the following command in the same directory:
 
-Run the following command in the same directory:
 ```
 deta new --python
 ```
 
-The command line will respond with the micro details. Save the endpoint as we will need it for the next step. 
+The command line will respond with some details about our micro. Save the endpoint as we will need it for the next step. 
 
-That's all we need for Deta configuration, now we need to register our app on GitHub to access their API.
-
-Here is a picture that sumarizes the general flow of our application.
+That's all we need for Deta configuration, now we need to register our app on GitHub to access their API. Here is a picture that sumarizes the general flow of our application.
 
 ![Flow](https://user-images.githubusercontent.com/20916697/115037395-0881ba00-9e94-11eb-987a-67d64644e7f7.png)
 
-- Head over to this link, and login with your GitHub account.
+- [Head over to this link](https://github.com/settings/developers), and login with your GitHub account.
 - Click on the `New OAuth app` button on the top right.
 
 ![image](https://user-images.githubusercontent.com/20916697/115032368-d7eb5180-9e8e-11eb-8ca4-23b8fe57e097.png)
@@ -60,11 +57,9 @@ CLIENT_ID=YOUR_COPIED_CLIENT_ID
 CLIENT_SECRET=YOUR_COPIED_CLIENT_SECRET
 ```
 
-And make sure to run `deta update -e .env` to update our micro with the environment variables. 
+And make sure to run `deta update -e .env` to update our micro with the environment variables. We are almost there!
 
-Before we begin, we need to set up our environment by installing the libraries. 
-
-Before we begin, we need to install all the libraries. Add a `requirements.txt` file with the following lines.
+Before we begin, we need to set up our environment by installing the libraries. Add a `requirements.txt` file with the following lines.
 ```python
 fastapi
 deta
@@ -174,9 +169,9 @@ ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token?'
 class GithubOauth():
     
     def login(self):
-        params = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI, 'scope': 'user', 'allow_signup': 'true'}
+        params = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI, 'scope': 'read:user', 'allow_signup': 'true'}
         params = urlencode(params)
-        return RedirectResponse(GITHUB_LOGIN_URL + params)
+        return GITHUB_LOGIN_URL + params
     
     def get_access_token(self, code):
         try:
@@ -288,7 +283,8 @@ def github_authenticate(code:str):
 
 ## Deploy on Deta micros
 Run `deta deploy` to deploy it on micros and start using it!
-![3099af58-cf5d-4b48-8176-adf625e2e0e5](https://user-images.githubusercontent.com/20916697/115048483-3a4c4e00-9e9f-11eb-8df2-44ff944cf814.gif)
+
+![demo](https://user-images.githubusercontent.com/20916697/115413011-74c52c00-a1ba-11eb-885e-300836c13d2b.gif)
 
 Thank you for reading! If you liked this article, [check out the other one which implements JWT Auth in a FastAPI application.](https://dev.to/deta/deta-fastapi-jwt-auth-part-1-4c82) [The full code is avaialable here.] (https://github.com/rohanshiva/Github-Login-FastAPI/tree/main)
 
