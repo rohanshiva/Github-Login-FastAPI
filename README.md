@@ -113,7 +113,7 @@ class GithubOauth():
 The `login` function simply builds the URL using the parameters, and returns the URL to the GitHub Login Page. [You can learn more about this here.](https://docs.github.com/en/developers/apps/authorizing-oauth-apps#1-request-a-users-github-identity)
 We can use this function when the user clicks login. 
 
-The scope parameter can be used to specify what data/rights you want from the user. Since we only want access to user's profile data, we can set it to `read:user`. [You can read more about other scope options here.](https://docs.github.com/en/developers/apps/scopes-for-oauth-apps).
+The scope parameter can be used to specify what data/rights you want from the user. Since we only want access to user's profile data, we can set it to `read:user`. [You can read more about other scope options here.](https://docs.github.com/en/developers/apps/scopes-for-oauth-apps)
 
 
 Once the user logins, they are redirected to our application with a special code. We can use this code to get an `access_token` to retrieve user information.
@@ -156,7 +156,6 @@ Here is what the file `github.py` looks like at the end:
 from urllib.parse import urlencode
 import requests
 from fastapi import HTTPException
-from fastapi.responses import RedirectResponse
 import os
 
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -266,7 +265,7 @@ github_oauth_handler = GithubOauth()
 
 @app.get("/github/login")
 def github_login():
-    return github_oauth_handler.login()
+    return RedirectResponse(github_oauth_handler.login())
 
 
 @app.get("/authenticate/github")
