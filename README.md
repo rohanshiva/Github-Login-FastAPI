@@ -12,27 +12,8 @@ GitHub Login essentially allows users to login using their GitHub account. Using
 - Deploy app to Deta Micros
 
 ## Setup
-Here is a picture that sumarizes the general flow of our application.
 
-![Flow](https://user-images.githubusercontent.com/20916697/115037395-0881ba00-9e94-11eb-987a-67d64644e7f7.png)
-
-To get started, we need to first register our app on GitHub to access their API.
-
-- Head over to this link, and login with your GitHub account.
-- Click on the `New OAuth app` button on the top right.
-
-![image](https://user-images.githubusercontent.com/20916697/115032368-d7eb5180-9e8e-11eb-8ca4-23b8fe57e097.png)
-
-![image](https://user-images.githubusercontent.com/20916697/115032493-fd785b00-9e8e-11eb-9fb9-ac35e5e6d7f7.png)
-- Name the application (I named it Login FastAPI + Deta Blog).
-
-- For the application URL, I added `http://127.0.0.1:8000`, because that's where my FastAPI applications run locally. 
-- Now for the callback URL, let's add `http://127.0.0.1:8000/authenticate/github`, this is important as GitHub routes the user back to this URL after they login. We need to implement this route in our FastAPI application
-
-After you register the app, you will be redirected to the following screen, make sure to copy the `CLIENT_ID` and `CLIENT_SECRET`, and don't forget to save it somewhere safe! 
-![image](https://user-images.githubusercontent.com/20916697/115034322-fe11f100-9e90-11eb-918a-a1a905b538b3.png)
-
-We have everything we need from GitHub, and we also need to get a Deta project key to use with Deta Base. We are using Base to store user information such as username, email, avatar url, and user id. 
+To get started, let's get our `PROJECT_KEY` for Deta Base. We are using Base to store user information such as username, email, avatar url, and user id. 
 
 To do that, navigate to the [Deta Console ](https://web.deta.sh/)then click on the arrow on the top left.
 If you don't already have a Deta account, [create one for free](https://web.deta.sh/). Once you confirm your email, Deta will automatically generate a Project Key, this is the one we need, copy it and  store it securely.
@@ -43,16 +24,47 @@ Create a new project and make sure to save the key in a secure place!
 
 ![image](https://user-images.githubusercontent.com/20916697/114434122-40cd8380-9b88-11eb-8ddc-7045ce5756ba.png)
 
-Add the following keys to your environment variables:
+Now we need to [install the Deta CLI](https://docs.deta.sh/docs/cli/install), we are deploying our application on Deta micros. After installing the CLI, create a folder for this project `github-login-fastapi`. 
+
+Run the following command in the same directory:
 ```
-DETA_PROJECT_KEY="YOUR_COPIED_PROJECT_KEY"
-CLIENT_ID="YOUR_COPIED_CLIENT_ID"
-CLIENT_SECRET="YOUR_COPIED_CLIENT_SECRET"
+deta new --python
 ```
+
+The command line will respond with the micro details. Save the endpoint as we will need it for the next step. 
+
+That's all we need for Deta configuration, now we need to register our app on GitHub to access their API.
+
+Here is a picture that sumarizes the general flow of our application.
+
+![Flow](https://user-images.githubusercontent.com/20916697/115037395-0881ba00-9e94-11eb-987a-67d64644e7f7.png)
+
+- Head over to this link, and login with your GitHub account.
+- Click on the `New OAuth app` button on the top right.
+
+![image](https://user-images.githubusercontent.com/20916697/115032368-d7eb5180-9e8e-11eb-8ca4-23b8fe57e097.png)
+
+![image](https://user-images.githubusercontent.com/20916697/115032493-fd785b00-9e8e-11eb-9fb9-ac35e5e6d7f7.png)
+- Name the application (I named it Login FastAPI + Deta Blog).
+
+- For the application URL, I added `https://7zdvec.deta.dev`, because that's the endpoint of my micro on Deta. 
+- Now for the callback URL, let's add `https://7zdvec.deta.dev/authenticate/github`, this is important as GitHub routes the user back to this URL after they login. We need to implement this route in our FastAPI application
+
+After you register the app, you will be redirected to the following screen, make sure to copy the `CLIENT_ID` and `CLIENT_SECRET`, and don't forget to save it somewhere safe! 
+![image](https://user-images.githubusercontent.com/20916697/115034322-fe11f100-9e90-11eb-918a-a1a905b538b3.png)
+
+We now have everything we need from GitHub and Deta. Add the following keys to `.env` file inside the same folder `github-login-fastapi`.
+```
+DETA_PROJECT_KEY=YOUR_COPIED_PROJECT_KEY
+CLIENT_ID=YOUR_COPIED_CLIENT_ID
+CLIENT_SECRET=YOUR_COPIED_CLIENT_SECRET
+```
+
+And make sure to run `deta update -e .env` to update our micro with the environment variables. 
 
 Before we begin, we need to set up our environment by installing the libraries. 
 
-Create a folder for this project `github-login-fastapi`, and add a `requirements.txt` file with the following lines.
+Before we begin, we need to install all the libraries. Add a `requirements.txt` file with the following lines.
 ```python
 fastapi
 deta
@@ -62,7 +74,6 @@ requests
 Run the following command to install the libraries 
 
 `pip install -r requirements.txt`
-
 
 Here is how our folder structure will look like at the end:
 
@@ -74,7 +85,7 @@ github-login-fastapi/
     └── requirements.txt
 ```
 
-That is everything we need for this project. -phew! Let's get started!
+That is everything we need for setting up this project. -phew! Let's get started!
 
 ## GitHub OAuth Logic
 
@@ -84,12 +95,11 @@ In `github.py`, add import all the tools and get all the environment variables.
 from urllib.parse import urlencode
 import requests
 from fastapi import HTTPException
-from fastapi.responses import RedirectResponse
 import os
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:8000/authenticate/github"
+REDIRECT_URI = "https://7zdvec.deta.dev/authenticate/github"
 GITHUB_LOGIN_URL = 'https://github.com/login/oauth/authorize?'
 ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token?'
 ```
@@ -100,13 +110,15 @@ Let's create a class to handle all the GitHub OAuth logic.
 class GithubOauth():
     
     def login(self):
-        params = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI, 'scope': 'user', 'allow_signup': 'true'}
+        params = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI, 'scope': 'read:user', 'allow_signup': 'true'}
         params = urlencode(params)
-        return RedirectResponse(GITHUB_LOGIN_URL + params)
+        return GITHUB_LOGIN_URL + params
 ```
 
-The `login` function simply builds the URL using the parameters, and redirects the user to the GitHub Login Page. [You can learn more about this here.](https://docs.github.com/en/developers/apps/authorizing-oauth-apps#1-request-a-users-github-identity)
+The `login` function simply builds the URL using the parameters, and returns the URL to the GitHub Login Page. [You can learn more about this here.](https://docs.github.com/en/developers/apps/authorizing-oauth-apps#1-request-a-users-github-identity)
 We can use this function when the user clicks login. 
+
+The scope parameter can be used to specify what data/rights you want from the user. Since we only want access to user's profile data, we can set it to `read:user`. [You can read more about other scope options here.](https://docs.github.com/en/developers/apps/scopes-for-oauth-apps).
 
 
 Once the user logins, they are redirected to our application with a special code. We can use this code to get an `access_token` to retrieve user information.
@@ -154,7 +166,7 @@ import os
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:8000/authenticate/github"
+REDIRECT_URI = "https://7zdvec.deta.dev/authenticate/github"
 GITHUB_LOGIN_URL = 'https://github.com/login/oauth/authorize?'
 ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token?'
 
@@ -215,7 +227,7 @@ When a user clicks login on the frontend, we can simply route them to `/github/l
 ```python
 @app.get("/github/login")
 def github_login():
-    return github_oauth_handler.login()
+    return RedirectResponse(github_oauth_handler.login())
 ```
 
 As you can see we are not doing much here, we are simply using the `login` function from `github_oauth_handler`, which redirects the user to the GitHub login page. 
@@ -234,7 +246,7 @@ def github_authenticate(code:str):
 
         return users_db.put(user)
     except:
-        raise HTTPException(status_code=401, detail='Failed to add user to users_db')
+        raise HTTPException(status_code=500)
 ```
         
 
@@ -274,19 +286,9 @@ def github_authenticate(code:str):
         raise HTTPException(status_code=401, detail='Failed to add user to users_db')
 ```
 
-![3099af58-cf5d-4b48-8176-adf625e2e0e5](https://user-images.githubusercontent.com/20916697/115048483-3a4c4e00-9e9f-11eb-8df2-44ff944cf814.gif)
-
 ## Deploy on Deta micros
-[Install the Deta CLI](https://docs.deta.sh/docs/cli/install), and run the following commands in the same directory to deploy our app on Deta micros. 
-
-
-```python
-deta login
-```
-
-```python
-deta new 
-```
+Run `deta deploy` to deploy it on micros and start using it!
+![3099af58-cf5d-4b48-8176-adf625e2e0e5](https://user-images.githubusercontent.com/20916697/115048483-3a4c4e00-9e9f-11eb-8df2-44ff944cf814.gif)
 
 Thank you for reading! If you liked this article, [check out the other one which implements JWT Auth in a FastAPI application.](https://dev.to/deta/deta-fastapi-jwt-auth-part-1-4c82) [The full code is avaialable here.] (https://github.com/rohanshiva/Github-Login-FastAPI/tree/main)
 
