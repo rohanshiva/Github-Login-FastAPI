@@ -1,12 +1,11 @@
 from urllib.parse import urlencode
 import requests
 from fastapi import HTTPException
-from fastapi.responses import RedirectResponse
 import os
 
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:8000/authenticate/github"
+REDIRECT_URI = "https://7zdvec.deta.dev/authenticate/github"
 GITHUB_LOGIN_URL = 'https://github.com/login/oauth/authorize?'
 ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token?'
 
@@ -14,9 +13,9 @@ ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token?'
 class GithubOauth():
     
     def login(self):
-        params = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI, 'scope': 'user', 'allow_signup': 'true'}
+        params = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI, 'scope': 'read:user', 'allow_signup': 'true'}
         params = urlencode(params)
-        return RedirectResponse(GITHUB_LOGIN_URL + params)
+        return GITHUB_LOGIN_URL + params
     
     def get_access_token(self, code):
         try:
