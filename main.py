@@ -12,7 +12,7 @@ github_oauth_handler = GithubOauth()
 
 @app.get("/github/login")
 def github_login():
-    return github_oauth_handler.login()
+    return RedirectResponse(github_oauth_handler.login())
 
 
 @app.get("/authenticate/github")
