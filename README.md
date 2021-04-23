@@ -285,5 +285,7 @@ Run `deta deploy` to deploy it on micros and start using it!
 
 ![demo](https://user-images.githubusercontent.com/20916697/115413011-74c52c00-a1ba-11eb-885e-300836c13d2b.gif)
 
-Thank you for reading! If you liked this article, [check out the other one which implements JWT Auth in a FastAPI application.](https://dev.to/deta/deta-fastapi-jwt-auth-part-1-4c82) [The full code is avaialable here.](https://github.com/rohanshiva/Github-Login-FastAPI/tree/main)
+Thank you for reading! If you liked this article, [check out the other one which implements JWT Auth in a FastAPI application.](https://dev.to/deta/deta-fastapi-jwt-auth-part-1-4c82) 
+
+[The full code is avaialable here.](https://github.com/rohanshiva/Github-Login-FastAPI/tree/main)
 
